@@ -1,38 +1,59 @@
 import turtle
+import random
 
+# Global puan değişkeni
+puan = 0
+
+# Ekranı kur
 ekran = turtle.Screen()
-ekran.title("Yön Tuşlarıyla Hareket")
 ekran.bgcolor("lightblue")
+ekran.title("Kaplumbağa Tıklama Oyunu")
 
 # Kaplumbağayı oluştur
 kaplumbaga = turtle.Turtle()
 kaplumbaga.shape("turtle")
-kaplumbaga.color("darkgreen")
-kaplumbaga.speed(1)
+kaplumbaga.penup()
+kaplumbaga.speed(0)  # anında hareket
 
-# Hareket fonksiyonları
-def yukari():
-    kaplumbaga.setheading(90)  # Yukarı yön (0: sağ, 90: yukarı, 180: sol, 270: aşağı)
-    kaplumbaga.forward(20)
+# Skoru yazdırmak için ayrı turtle
+yazi = turtle.Turtle()
+yazi.hideturtle()
+yazi.penup()
+yazi.goto(0, 200)
+yazi.write("Puan: 0", align="center", font=("Arial", 20, "bold"))
 
-def asagi():
-    kaplumbaga.setheading(270)
-    kaplumbaga.forward(20)
 
-def sola():
-    kaplumbaga.setheading(180)
-    kaplumbaga.forward(20)
+# Rastgele konuma zıplama
+def rastgele_konum():
+    if puan < 3:
+        x = random.randint(-200, 200)
+        y = random.randint(-150, 150)
+        kaplumbaga.teleport(x, y)
+        # 1 saniye sonra tekrar zıplasın
+        ekran.ontimer(rastgele_konum, 800)
 
-def saga():
-    kaplumbaga.setheading(0)
-    kaplumbaga.forward(20)
 
-# Tuşları dinle
-ekran.listen()
-ekran.onkey(yukari, "w")
-ekran.onkey(asagi, "s")
-ekran.onkey(sola, "a")
-ekran.onkey(saga, "d")
+# Tıklama olayında puan artır
+def tiklandi(x, y):
+    global puan
+    puan += 1
+    yazi.clear()
+    yazi.write(f"Puan: {puan}", align="center", font=("Arial", 20, "bold"))
 
-# Ekranı kapatmayı engelle
-ekran.mainloop()
+    if puan >= 3:
+        kaplumbaga.hideturtle()
+        yazi.goto(0, 0)
+        yazi.write("🎉 Oyun Bitti! 🎉", align="center", font=("Arial", 24, "bold"))
+    else:
+        rastgele_konum()
+
+
+# Kaplumbağaya tıklanınca puan kazan
+kaplumbaga.onclick(tiklandi)
+
+# Oyunu başlat
+rastgele_konum()
+
+# Sonsuz döngü
+turtle.done()
+
